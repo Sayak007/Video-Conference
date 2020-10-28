@@ -6,6 +6,7 @@ const myPeer = new Peer(undefined, {
   port: '443'
 })
 let myVideoStream;
+var participants = 1;
 const myVideo = document.createElement('video')
 myVideo.muted = true;
 const peers = {}
@@ -24,7 +25,8 @@ navigator.mediaDevices.getUserMedia({
   })
 
   socket.on('user-connected', userId => {
-    connectToNewUser(userId, stream)
+    connectToNewUser(userId, stream);
+    console.log(userId);
   })
   // input value
   let text = $("input");
@@ -35,8 +37,8 @@ navigator.mediaDevices.getUserMedia({
       text.val('')
     }
   });
-  socket.on("createMessage", message => {
-    $(".messages").append(`<li class="message"><b>user</b><br/>${message}</li>`);
+  socket.on("createMessage", (message,userId)=> {
+    $(".messages").append(`<li class="message"><b>${userId}</b><br/>${message}</li>`);
     scrollToBottom()
   })
 })
@@ -59,7 +61,8 @@ function connectToNewUser(userId, stream) {
     video.remove()
   })
 
-  peers[userId] = call
+  peers[userId] = call;
+  participants=participants+1
 }
 
 function addVideoStream(video, stream) {
@@ -69,7 +72,6 @@ function addVideoStream(video, stream) {
   })
   videoGrid.append(video)
 }
-
 
 
 const scrollToBottom = () => {
@@ -104,7 +106,6 @@ const playStop = () => {
 const setMuteButton = () => {
   const html = `
     <i class="fas fa-microphone"></i>
-    <span>Mute</span>
   `
   document.querySelector('.main__mute_button').innerHTML = html;
 }
@@ -112,7 +113,6 @@ const setMuteButton = () => {
 const setUnmuteButton = () => {
   const html = `
     <i class="unmute fas fa-microphone-slash"></i>
-    <span>Unmute</span>
   `
   document.querySelector('.main__mute_button').innerHTML = html;
 }
@@ -120,7 +120,6 @@ const setUnmuteButton = () => {
 const setStopVideo = () => {
   const html = `
     <i class="fas fa-video"></i>
-    <span>Stop Video</span>
   `
   document.querySelector('.main__video_button').innerHTML = html;
 }
@@ -128,7 +127,24 @@ const setStopVideo = () => {
 const setPlayVideo = () => {
   const html = `
   <i class="stop fas fa-video-slash"></i>
-    <span>Play Video</span>
   `
   document.querySelector('.main__video_button').innerHTML = html;
 }
+
+function participant(){
+    const html=`<b>${participants} participants are active now</b>`
+    document.querySelector('.part').innerHTML=html;
+    setTimeout(participant, 1000);
+}
+participant();
+
+document.getElementById("share_screen").addEventListener('click',function(e){
+    chrome.desktopCapture.chooseDesktopMedia(["screen", "window"],
+        navigator.mediaDevices.geDisplayMedia({
+            video:true,
+        }).then((stream)=>{
+            console.log(stream);
+            myVideoStream.getVideoTracks()[0].replaceTrack(stream);
+        })
+    );
+})

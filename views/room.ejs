@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
    <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Video Conference</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=12.0, minimum-scale=.25, user-scalable=yes">
+   <link rel="icon" href="https://video-confcall.web.app/image/logo.jpg" />
+   <title>V-CONFCALL</title>
    <script>
       const ROOM_ID = "<%= roomId %>"
    </script>
@@ -16,6 +17,7 @@
    <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+   <script src="http://webrtc.github.io/adapter/adapter-latest.js"></script>
 
    <script src="script.js" defer></script>
    <style>
@@ -25,79 +27,170 @@
          flex-wrap: wrap;
       }
       video{
-         height: 300px;
-         width: 400px;
+         width: 380px;
+         height: 292px;
          object-fit: cover;
-         
          border-radius: 10px;
          border: 2px solid #0099ff;
          margin: 2px;
       }
+
+      #snackbar {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 12px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 17px;
+        }
+
+    #snackbar.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+
+    @-webkit-keyframes fadein {
+        from {bottom: 0; opacity: 0;} 
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 30px; opacity: 1;}
+    }
+
+    @-webkit-keyframes fadeout {
+        from {bottom: 30px; opacity: 1;} 
+        to {bottom: 0; opacity: 0;}
+    }
+
+    @keyframes fadeout {
+        from {bottom: 30px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+    }
    </style>
 </head>
 <body>
-   <div class="main">
-      <div class="main__left">
-         <div class="main__videos">
-            <div id="video-grid">
-      
+    <h5 class="header">
+        <img src="https://video-confcall.web.app/image/logo.jpg" style="height: 25px;">
+        V-CONFCALL
+    </h5>
+    <div class="hd-right" id="tool" onclick="meetid();" data-toggle="tooltip" data-placement="bottom" title="Copy Meeting Id">
+        <i class="fa fa-copy"></i>
+    </div>
+    <div class="container">
+        <div class="col-md-11 mx-auto">
+            <div class="row justify-content-center" style="max-height: 90vh;">
+                <div class="main__videos">
+                    <div id="video-grid">
+            
+                    </div>
+                </div>
             </div>
-         </div>
-         <div class="main__controls">
-            <div class="main__controls__block">
-               <div onclick="muteUnmute()" class="main__controls__button main__mute_button">
-                  <i class="fas fa-microphone"></i>
-                  <span>Mute</span>
-               </div>
-               <div onclick="playStop()" class="main__controls__button main__video_button" >
-                  <i class="fas fa-video"></i>
-                  <span>Stop Video</span>
-               </div>
-            </div>
-            <div class="main__controls__block">
-               <div class="main__controls__button">
-                  <i class="fas fa-shield-alt"></i>
-                  <span>Security</span>
-               </div>
-               <div class="main__controls__button">
-                  <i class="fas fa-user-friends"></i>
-                  <span>Participants</span>
-               </div>
-               
-                <a href="#baseModal" class="trigger-btn main__controls__button" data-toggle="modal">
-                    <i class="fas fa-comment-alt"></i>
-                  <span>Chat</span>
-                </a>
-            </div>
-            <div class="main__controls__block">
-               <div class="main__controls__button">
-                  <span class="leave_meeting">Leave Meeting</span>
-               </div>
-            </div>
-         </div>
-      </div>
-      <div id="baseModal" class="modal fade">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <div class="main_right">
-                        <div class="main__header">
-                            <h6>Chat</h6>
+            <div class="row">
+                <div class="main__controls">
+                    <div class="main__controls__block">
+                        <a href="#partModal" class="trigger-btn main__controls__button" data-toggle="modal">
+                            <i class="fas fa-user-friends"></i>
+                        
+                        </a>
+                        <div id="share_screen" class="share_screen main__controls__button">
+                            <i class="fa fa-desktop"></i>
+                        
                         </div>
-                        <div class="main__chat_window">
-                            <ul class="messages">
-                            
-                            </ul>
+                    </div>
 
+                    <div class="main__controls__block">
+                        <div onclick="muteUnmute()" class="main__controls__button main__mute_button">
+                            <i class="fas fa-microphone"></i>
+                            
                         </div>
-                        <div class="main__message_container">
-                            <input id="chat_message" type="text" placeholder="Type message here...">
+                        <div class="main__controls__button end" style="border: 1px solid #CC3B33;" onmouseover="this.style.color='white';"
+                        onclick="window.location.replace('https://video-confcall.web.app/');">
+                            <i class="fas fa-phone-slash leave_meeting" onmouseover="this.style.color='white';" onmouseout="this.style.color='#EB534B';"></i>
                         </div>
+                        <div onclick="playStop()" class="main__controls__button main__video_button" >
+                            <i class="fas fa-video"></i>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="main__controls__block">
+                        <a href="#baseModal" class="trigger-btn main__controls__button" data-toggle="modal">
+                            <i class="fas fa-comment-alt"></i>
+                       
+                        </a>
+                    </div>
+                </div>
+            </div>
+      </div>
+   </div>
+
+
+   <div id="baseModal" class="modal fade">
+    <div class="modal-dialog" role="document" style="border-radius: 10px;">
+        <div class="modal-content" >
+            <div class="modal-body" style="background-color: #343434;">
+                <div class="main_right">
+                    <div class="main__header">
+                        <h6>Chat</h6>
+                    </div>
+                    <div class="main__chat_window">
+                        <ul class="messages">
+                        
+                        </ul>
+
+                    </div>
+                    <div class="main__message_container">
+                        <input id="chat_message" type="text" placeholder="Type message here...">
                     </div>
                 </div>
             </div>
         </div>
     </div>
-   </div>
+    </div>
+
+    <div id="partModal" class="modal fade">
+        <div class="modal-dialog" role="document" style="border-radius: 10px;">
+            <div class="modal-content" >
+                <div class="modal-body" style="background-color: #343434;">
+                    <div class="main_right">
+                        <div class="main__header">
+                            <h6>Participants</h6>
+                        </div>
+                        <div class="part" style="color:white"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="snackbar">Meeting ID copied to clipboard</div>
+
+    <script>
+        function meetid(){
+            var url = window.location.href;
+            var mtid=url.replace('https://video-confcall.herokuapp.com/','');
+            var inp =document.createElement('input');
+            document.body.appendChild(inp);
+            inp.value =mtid;
+            inp.select();
+            document.execCommand('copy',false);
+            inp.remove();
+            //document.body.remove(dummy);
+            var x = document.getElementById("snackbar");
+            x.className = "show";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        }
+    </script>
+
 </body>
 </html>
