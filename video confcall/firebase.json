@@ -1,0 +1,11 @@
+{
+  "hosting": {
+  "site": "video-confcall",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
