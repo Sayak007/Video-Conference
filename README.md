@@ -10,5 +10,3 @@
 
 ## Mobile Screenshot
 ![image](https://github.com/Sayak007/Video-Conference/blob/main/images/vconfcall4.jpg)
-
-![image](https://github.com/Sayak007/Video-Conference/blob/main/images/vconfcall2.jpg)
